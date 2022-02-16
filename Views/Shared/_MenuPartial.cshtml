@@ -1,0 +1,20 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Game.Authorization
+@using Game.Utils;
+
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@if(SignInManager.IsSignedIn(User))
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-area="" asp-controller="Character" asp-action="Index">Manage Characters</a>
+    </li>
+
+    @if(User.IsInRole(Constants.AdministratorRole))
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="" asp-controller="Weapon" asp-action="Index">Manage weapons</a>
+        </li>
+    }
+}
