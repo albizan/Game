@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Game.Data.Migrations
+namespace Game.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -49,7 +49,7 @@ namespace Game.Data.Migrations
 
                     b.HasIndex("WeaponId");
 
-                    b.ToTable("Characters", (string)null);
+                    b.ToTable("Characters");
                 });
 
             modelBuilder.Entity("Game.Models.Weapon", b =>
@@ -64,6 +64,7 @@ namespace Game.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("WeaponType")
@@ -71,7 +72,7 @@ namespace Game.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Weapons", (string)null);
+                    b.ToTable("Weapons");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -279,8 +280,9 @@ namespace Game.Data.Migrations
             modelBuilder.Entity("Game.Models.Character", b =>
                 {
                     b.HasOne("Game.Models.Weapon", "Weapon")
-                        .WithMany()
-                        .HasForeignKey("WeaponId");
+                        .WithMany("Characters")
+                        .HasForeignKey("WeaponId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Weapon");
                 });
@@ -334,6 +336,11 @@ namespace Game.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Game.Models.Weapon", b =>
+                {
+                    b.Navigation("Characters");
                 });
 #pragma warning restore 612, 618
         }

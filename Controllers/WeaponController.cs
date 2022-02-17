@@ -127,7 +127,7 @@ namespace Game.Controllers
                 return NotFound();
             }
 
-            var weapon = await _context.Weapons
+            var weapon = await _context.Weapons.Include(w => w.Characters)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (weapon == null)
             {

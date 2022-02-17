@@ -17,6 +17,12 @@ namespace Game.Data
             {
                 var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
                 var roleManager = serviceProvider.GetService<RoleManager<IdentityRole>>();
+
+                if(roleManager == null || userManager == null)
+                {
+                    throw new Exception("roleManager / userManager is null, aboring seed");
+                }
+
                 // Create Administrator and Helper Roles
                 await CreateRole(roleManager, Constants.AdministratorRole);
                 await CreateRole(roleManager, Constants.HelperRole);
@@ -32,7 +38,7 @@ namespace Game.Data
                 user = await CreateUser(userManager, password, "helper@game.com");
                 await AddRoleToUser(userManager, Constants.HelperRole, user);
 
-                // SeedDB(context);
+                SeedDbWithData(context);
             }
         }
 
@@ -84,36 +90,37 @@ namespace Game.Data
             await userManager.AddToRoleAsync(user, roleName);
         }
         
-        public static void SeedDB(ApplicationDbContext context)
+        public static void SeedDbWithData(ApplicationDbContext db)
         {
-            if(context.Weapons != null)
+            if (db.Weapons == null)
+                throw new Exception("Weapons is null, abort seed");
+
+            // If weapons table is empty, insert initial data
+            if(!db.Weapons.Any())
             {
-                if (context.Weapons.Any())
-                {
-                    return;   // DB has been seeded
-                }
-                context.Weapons.AddRange(
-                new Weapon
-                {
-                    Name = "Small Sword",
-                    Damage = 20,
-                    WeaponType = WeaponType.Warrior
-                },
-                new Weapon
-                {
-                    Name = "Big Sword",
-                    Damage = 80,
-                    WeaponType = WeaponType.Warrior
-                },
-                new Weapon
-                {
-                    Name = "Magic Sword",
-                    Damage = 46,
-                    WeaponType = WeaponType.Wizard
-                }
-             );
+                db.Weapons.AddRange(
+                    new Weapon
+                    {
+                        Name = "Small Sword",
+                        Damage = 20,
+                        WeaponType = WeaponType.Warrior
+                    },
+                    new Weapon
+                    {
+                        Name = "Big Sword",
+                        Damage = 80,
+                        WeaponType = WeaponType.Warrior
+                    },
+                    new Weapon
+                    {
+                        Name = "Magic Sword",
+                        Damage = 46,
+                        WeaponType = WeaponType.Wizard
+                    }
+                );
             }
-            context.SaveChanges();
+
+            db.SaveChanges();
         }
     }
 }

@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Game.Data.Migrations
+namespace Game.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220215102144_Add_Weapon_Character_Relation")]
-    partial class Add_Weapon_Character_Relation
+    [Migration("20220217152805_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -44,7 +44,7 @@ namespace Game.Data.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<int>("WeaponId")
+                    b.Property<int?>("WeaponId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -66,6 +66,7 @@ namespace Game.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("WeaponType")
@@ -73,7 +74,7 @@ namespace Game.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Weapon");
+                    b.ToTable("Weapons");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -281,10 +282,9 @@ namespace Game.Data.Migrations
             modelBuilder.Entity("Game.Models.Character", b =>
                 {
                     b.HasOne("Game.Models.Weapon", "Weapon")
-                        .WithMany()
+                        .WithMany("Characters")
                         .HasForeignKey("WeaponId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Weapon");
                 });
@@ -338,6 +338,11 @@ namespace Game.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Game.Models.Weapon", b =>
+                {
+                    b.Navigation("Characters");
                 });
 #pragma warning restore 612, 618
         }
