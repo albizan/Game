@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Game.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Game.Data
 {

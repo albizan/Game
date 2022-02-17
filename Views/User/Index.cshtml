@@ -1,0 +1,57 @@
+﻿@using Game.ViewModels;
+@using Game.Utils;
+
+@model IList<IdentityUser_Roles>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Id
+            </th>
+            <th>
+                E-Mail
+            </th>
+            <th>
+                Role
+            </th>
+            <th>
+                Action
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @item.User.Id
+            </td>
+            <td>
+                @item.User.Email
+            </td>
+            <td>
+                @String.Join(", ", item.Roles)
+            </td>
+            <td>
+                    @if(!item.Roles.Contains(Constants.AdministratorRole))
+                    {
+                       @if (item.Roles.Contains(Constants.HelperRole))
+                        {
+                            <form asp-controller="User" asp-action="RemoveHelper" asp-route-id="@item.User.Id"  method="post">
+                                <input  type="submit" class="btn bg-danger text-white" value="Remove helper" />
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-controller="User" asp-action="MakeHelper" asp-route-id="@item.User.Id" method="post">
+                                <input type="submit" class="btn btn-primary" value="Make helper" />
+                            </form>
+                        } 
+                    }
+                    
+
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

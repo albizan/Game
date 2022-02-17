@@ -49,7 +49,7 @@ namespace Game.Data.Migrations
 
                     b.HasIndex("WeaponId");
 
-                    b.ToTable("Characters");
+                    b.ToTable("Characters", (string)null);
                 });
 
             modelBuilder.Entity("Game.Models.Weapon", b =>
@@ -71,7 +71,7 @@ namespace Game.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Weapons");
+                    b.ToTable("Weapons", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

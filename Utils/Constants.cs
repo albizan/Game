@@ -10,5 +10,6 @@
 
         // Roles
         public static readonly string AdministratorRole = "Administrator";
+        public static readonly string HelperRole = "Helper";
     }
 }

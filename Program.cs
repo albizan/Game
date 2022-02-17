@@ -40,9 +40,9 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<ApplicationDbContext>();
     context.Database.Migrate();
-    var testUserPw = builder.Configuration.GetValue<string>("SeedUserPW");
+    var password = builder.Configuration.GetValue<string>("SeedUserPW");
     try {
-        await SeedData.Initialize(services, testUserPw);
+        await SeedData.Initialize(services, password);
     }
     catch(Exception e) {
         Console.WriteLine(e.Message);

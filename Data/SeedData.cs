@@ -11,38 +11,48 @@ namespace Game.Data
 {
     public static class SeedData
     {
-        public static async Task Initialize(IServiceProvider serviceProvider, string testUserPw)
+        public static async Task Initialize(IServiceProvider serviceProvider, string password)
         {
-            using (var context = new ApplicationDbContext(
-                serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
+            using (var context = new ApplicationDbContext(serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
             {
+                var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
+                var roleManager = serviceProvider.GetService<RoleManager<IdentityRole>>();
+                // Create Administrator and Helper Roles
+                await CreateRole(roleManager, Constants.AdministratorRole);
+                await CreateRole(roleManager, Constants.HelperRole);
 
-                var adminID = await EnsureUser(serviceProvider, testUserPw, "admin@game.com");
-                await EnsureRole(serviceProvider, adminID, Constants.AdministratorRole);
+                
+                IdentityUser user;
 
-                SeedDB(context);
+                // Create Admin
+                user = await CreateUser(userManager, password, "administrator@game.com");
+                await AddRoleToUser(userManager, Constants.AdministratorRole, user);
+
+                // Create Helper
+                user = await CreateUser(userManager, password, "helper@game.com");
+                await AddRoleToUser(userManager, Constants.HelperRole, user);
+
+                // SeedDB(context);
             }
         }
 
-        private static async Task<string> EnsureUser(IServiceProvider serviceProvider,
-                                                    string testUserPw, string UserName)
+        private static async Task<IdentityUser> CreateUser(UserManager<IdentityUser> userManager, string password, string userName)
         {
-            var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
-
             if(userManager == null)
             {
                 throw new Exception("userManager is null, abort seeding");
             }
 
-            var user = await userManager.FindByNameAsync(UserName);
+            var user = await userManager.FindByNameAsync(userName);
             if (user == null)
             {
                 user = new IdentityUser
                 {
-                    UserName = UserName,
+                    UserName = userName,
+                    Email = userName,
                     EmailConfirmed = true
                 };
-                await userManager.CreateAsync(user, testUserPw);
+                await userManager.CreateAsync(user, password);
             }
 
             if (user == null)
@@ -50,43 +60,30 @@ namespace Game.Data
                 throw new Exception("The password is probably not strong enough!");
             }
 
-            return user.Id;
+            return user;
         }
 
-        private static async Task<IdentityResult> EnsureRole(IServiceProvider serviceProvider,
-                                                                      string uid, string role)
+        private static async Task<IdentityRole> CreateRole(RoleManager<IdentityRole> roleManager, string roleName)
         {
-            var roleManager = serviceProvider.GetService<RoleManager<IdentityRole>>();
-
             if (roleManager == null)
             {
                 throw new Exception("roleManager null");
             }
 
-            IdentityResult IR;
-            if (!await roleManager.RoleExistsAsync(role))
+            var role = await roleManager.FindByNameAsync(roleName);
+            if(role == null)
             {
-                IR = await roleManager.CreateAsync(new IdentityRole(role));
+                role = new IdentityRole(roleName);
+                await roleManager.CreateAsync(role);
             }
 
-            var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
-
-            if (userManager == null)
-            {
-                throw new Exception("userManager is null");
-            }
-
-            var user = await userManager.FindByIdAsync(uid);
-
-            if (user == null)
-            {
-                throw new Exception("The testUserPw password was probably not strong enough!");
-            }
-
-            IR = await userManager.AddToRoleAsync(user, role);
-
-            return IR;
+            return role;
         }
+
+        private static async Task AddRoleToUser(UserManager<IdentityUser> userManager, string roleName, IdentityUser user) {
+            await userManager.AddToRoleAsync(user, roleName);
+        }
+        
         public static void SeedDB(ApplicationDbContext context)
         {
             if(context.Weapons != null)
