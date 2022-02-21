@@ -27,7 +27,6 @@ namespace Game.Controllers
             {
                 var roles = await _userManager.GetRolesAsync(user);
                 usersWithRoles.Add(new IdentityUser_Roles() { Roles = roles, User=user });
-
             }
             return View(usersWithRoles);
         }

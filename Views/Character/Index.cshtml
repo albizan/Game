@@ -10,9 +10,10 @@
     ViewData["Title"] = "All characters";
 }
 
-@if(User.IsInRole(Constants.AdministratorRole))
+@if(Utils.CanApproveCharacters(ViewBag.Roles))
 {
     <h1>All characters</h1>
+    <p>Roles: @string.Join(", ", ViewBag.Roles)</p>
 } else
 {
     <h1>All my characters</h1>
@@ -40,6 +41,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Weapon)
             </th>
+            <th>Status</th>
             <th></th>
         </tr>
     </thead>
@@ -59,12 +61,31 @@
                 @Html.DisplayFor(modelItem => item.Type)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Weapon.Name)
+                @(item.Weapon != null ? item.Weapon.Name : "No Weapon")
+            </td>
+            <td>
+                @if(item.IsApproved)
+                {
+                    <span class="btn-primary btn">Approved</span>
+                }
+                else
+                {
+                    <span class="btn-primary btn">Awaiting approval</span>
+                }
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
+                @if(Utils.CanApproveCharacters(ViewBag.Roles))
+                {
+                    if(!item.IsApproved) {
+                        <form method="post" asp-action="Approve" asp-route-id=@item.Id>
+                            <input class="btn btn-danger" type="submit" value="Approve"/>
+                        </form>
+                    }
+                    
+                }
             </td>
         </tr>
 }

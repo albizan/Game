@@ -20,6 +20,8 @@ namespace Game.Data
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
 
+            modelBuilder.Entity<Character>().Property(c => c.IsApproved).HasDefaultValue(false);
+
             base.OnModelCreating(modelBuilder);
         }
     }

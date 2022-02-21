@@ -28,8 +28,7 @@ builder.Services.AddAuthorization(options =>
 });
 
 // Register Auth Handlers
-builder.Services.AddScoped<IAuthorizationHandler, OwnerOfCharacterAuthorizationHandler>();
-builder.Services.AddScoped<IAuthorizationHandler, AdministratorAuthorizationHandler>();
+builder.Services.AddScoped<IAuthorizationHandler, CharacterAuthorizationHandler>();
 
 // Build the app instance
 var app = builder.Build();

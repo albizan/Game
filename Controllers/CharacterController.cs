@@ -12,9 +12,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Game.Utils;
 using Game.Authorization.AuthorizationHandlers;
+using System.Security.Claims;
+using Game.Authorization;
 
 namespace Game.Controllers
 {
+    [Authorize]
     public class CharacterController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -38,13 +41,19 @@ namespace Game.Controllers
                 return NotFound();
             }
 
-            if(User.IsInRole(Constants.AdministratorRole))
+            // Get all roles for the User
+            var userIdentity = (ClaimsIdentity)User.Identity;
+            var claims = User.Claims;
+            var roleClaimType = userIdentity.RoleClaimType;
+            var roles = claims.Where(c => c.Type == roleClaimType).Select(c => c.Value).ToList();
+            if (roles.Contains(Constants.AdministratorRole) || roles.Contains(Constants.HelperRole))
             {
                 characters = _context.Characters.Include(c => c.Weapon);
             } else {
                 characters = _context.Characters.Include(c => c.Weapon).Where(c => c.OwnerID == _userManager.GetUserId(User));
             }
-           
+
+            ViewBag.Roles = roles;
             return View(await characters.ToListAsync());
         }
 
@@ -62,7 +71,6 @@ namespace Game.Controllers
 
             // If user sending request owns the resource OR user sending request is Admin
             //if (User.IsInRole(Constants.AdministratorRole) || character.OwnerID == user.Id)
-
             if (isAuthorized.Succeeded) {
                 ViewBag.TotalDamage = character.Damage + character.Weapon?.Damage;
                 return View(character);
@@ -205,6 +213,21 @@ namespace Game.Controllers
             if (!isAuthorized.Succeeded) return NotFound();
 
             _context.Characters.Remove(character);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST: Character/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [AuthorizeApproval]
+        public async Task<IActionResult> Approve(int id)
+        {
+            var character = await _context.Characters.FindAsync(id);
+            if(character == null)
+                return NotFound();
+
+            character.IsApproved = true;
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

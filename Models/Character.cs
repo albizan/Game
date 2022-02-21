@@ -6,6 +6,7 @@
         public string? OwnerID { get; set; }
         public string? Name { get; set; }
         public int Damage { get; set; }
+        public bool IsApproved { get; set; }
         public CharacterType Type { get; set; }
         public Weapon? Weapon { get; set; }
         public int? WeaponId { get; set; }
