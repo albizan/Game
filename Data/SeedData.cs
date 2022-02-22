@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 
-// dotnet aspnet-codegenerator razorpage -m Contact -dc ApplicationDbContext -outDir Pages\Contacts --referenceScriptLibraries
 namespace Game.Data
 {
     public static class SeedData
@@ -37,6 +36,12 @@ namespace Game.Data
                 // Create Helper
                 user = await CreateUser(userManager, password, "helper@game.com");
                 await AddRoleToUser(userManager, Constants.HelperRole, user);
+
+                // Create User 1
+                await CreateUser(userManager, password, "user@game.com");
+
+                // Create User 2
+                await CreateUser(userManager, password, "user2@game.com");
 
                 SeedDbWithData(context);
             }
