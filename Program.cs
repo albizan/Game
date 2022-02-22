@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Game.Authorization.AuthorizationHandlers;
+using Game.Authorization.Requirements;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,10 +26,12 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddAuthorization(options =>
 {
     options.FallbackPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+    options.AddPolicy("SubscriptionDuration", p => p.Requirements.Add(new MinimumSubscriptionDurationRequirement(2)));
 });
 
 // Register Auth Handlers
 builder.Services.AddScoped<IAuthorizationHandler, CharacterAuthorizationHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, MinimumSubscriptionDurationHandler>();
 
 // Build the app instance
 var app = builder.Build();

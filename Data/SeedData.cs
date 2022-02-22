@@ -4,7 +4,7 @@ using Game.Models;
 using Game.Utils;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
+using System.Security.Claims;
 
 namespace Game.Data
 {
@@ -17,9 +17,13 @@ namespace Game.Data
                 var userManager = serviceProvider.GetService<UserManager<IdentityUser>>();
                 var roleManager = serviceProvider.GetService<RoleManager<IdentityRole>>();
 
-                if(roleManager == null || userManager == null)
+                if(userManager == null)
                 {
-                    throw new Exception("roleManager / userManager is null, aboring seed");
+                    throw new Exception("Error, userManager is null, aborting seed");
+                }
+                if (roleManager == null)
+                {
+                    throw new Exception("Error, roleManager is null, aborting seed");
                 }
 
                 // Create Administrator and Helper Roles
@@ -32,16 +36,20 @@ namespace Game.Data
                 // Create Admin
                 user = await CreateUser(userManager, password, "administrator@game.com");
                 await AddRoleToUser(userManager, Constants.AdministratorRole, user);
+                await userManager.AddClaimAsync(user, new Claim("subscription", "2013-02-06"));
 
                 // Create Helper
                 user = await CreateUser(userManager, password, "helper@game.com");
                 await AddRoleToUser(userManager, Constants.HelperRole, user);
+                await userManager.AddClaimAsync(user, new Claim("subscription", "2018-01-04"));
 
                 // Create User 1
-                await CreateUser(userManager, password, "user@game.com");
+                user = await CreateUser(userManager, password, "user@game.com");
+                await userManager.AddClaimAsync(user, new Claim("subscription", "2021-01-04"));
 
                 // Create User 2
-                await CreateUser(userManager, password, "user2@game.com");
+                user = await CreateUser(userManager, password, "user2@game.com");
+                await userManager.AddClaimAsync(user, new Claim("subscription", "2022-01-01"));
 
                 SeedDbWithData(context);
             }

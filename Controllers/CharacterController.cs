@@ -40,22 +40,31 @@ namespace Game.Controllers
             {
                 return NotFound();
             }
+            
+            characters = _context.Characters.Include(c => c.Weapon).Where(c => c.OwnerID == _userManager.GetUserId(User));
+;           return View(await characters.ToListAsync());
+        }
+
+        [Authorize(Policy = "SubscriptionDuration")]
+        public async Task<IActionResult> Manage()
+        {
+            IQueryable<Character> characters;
+
+            if (User == null)
+            {
+                return NotFound();
+            }
 
             // Get all roles for the User
             var userIdentity = (ClaimsIdentity)User.Identity;
             var claims = User.Claims;
             var roleClaimType = userIdentity.RoleClaimType;
             var roles = claims.Where(c => c.Type == roleClaimType).Select(c => c.Value).ToList();
-            if (roles.Contains(Constants.AdministratorRole) || roles.Contains(Constants.HelperRole))
-            {
-                characters = _context.Characters.Include(c => c.Weapon);
-            } else {
-                characters = _context.Characters.Include(c => c.Weapon).Where(c => c.OwnerID == _userManager.GetUserId(User));
-            }
+            characters = _context.Characters.Include(c => c.Weapon);
 
             ViewBag.Roles = roles;
             ViewBag.UserId = _userManager.GetUserId(User);
-;            return View(await characters.ToListAsync());
+;           return View(await characters.ToListAsync());
         }
 
         // GET: Character/Details/5
@@ -230,7 +239,7 @@ namespace Game.Controllers
 
             character.IsApproved = true;
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Manage));
         }
 
         private bool CharacterExists(int id)

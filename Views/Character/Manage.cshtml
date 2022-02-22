@@ -10,7 +10,17 @@
     ViewData["Title"] = "All characters";
 }
 
-<h1>All my characters</h1>
+@if(Utils.CanApproveCharacters(ViewBag.Roles))
+{
+    <h1>All characters</h1>
+    <p>Roles: @string.Join(", ", ViewBag.Roles)</p>
+} else
+{
+    <h1>All my characters</h1>
+}
+<p>@ViewBag.UserId</p>
+
+
 <p>
     <a asp-action="Create">Create New</a>
 </p>
@@ -34,6 +44,7 @@
             </th>
             <th>Status</th>
             <th>Links</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -65,9 +76,23 @@
                 }
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                @if(User.IsInRole(Constants.AdministratorRole) || ViewBag.UserId == item.OwnerID)
+                {
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> 
+                }
+            </td>
+            <td>
+                @if(Utils.CanApproveCharacters(ViewBag.Roles))
+                {
+                    if(!item.IsApproved) {
+                        <form method="post" asp-action="Approve" asp-route-id=@item.Id>
+                            <input class="btn btn-danger" type="submit" value="Approve"/>
+                        </form>
+                    }
+                    
+                }
             </td>
         </tr>
 }
