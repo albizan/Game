@@ -54,7 +54,8 @@ namespace Game.Controllers
             }
 
             ViewBag.Roles = roles;
-            return View(await characters.ToListAsync());
+            ViewBag.UserId = _userManager.GetUserId(User);
+;            return View(await characters.ToListAsync());
         }
 
         // GET: Character/Details/5
