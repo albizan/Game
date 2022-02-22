@@ -8,6 +8,7 @@ namespace Game.Data
     {
         public DbSet<Character>? Characters { get; set; }
         public DbSet<Weapon>? Weapons { get; set; }
+        public DbSet<Perk>? Perks { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder b) => b.LogTo(Console.WriteLine, LogLevel.Warning);
@@ -24,5 +25,6 @@ namespace Game.Data
 
             base.OnModelCreating(modelBuilder);
         }
+        public DbSet<Game.Models.Perk> Perk { get; set; }
     }
 }

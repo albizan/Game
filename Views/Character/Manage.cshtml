@@ -72,15 +72,15 @@
                 }
                 else
                 {
-                    <span class="btn-primary btn">Awaiting approval</span>
+                    <span class="btn-dark btn">Pending</span>
                 }
             </td>
             <td>
                 @if(User.IsInRole(Constants.AdministratorRole) || ViewBag.UserId == item.OwnerID)
                 {
-                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                    <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> 
+                    <a class="btn btn-info" role="button" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                    <a class="btn btn-info" role="button" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                    <a class="btn btn-info" role="button" asp-action="Delete" asp-route-id="@item.Id">Delete</a> 
                 }
             </td>
             <td>
@@ -88,7 +88,7 @@
                 {
                     if(!item.IsApproved) {
                         <form method="post" asp-action="Approve" asp-route-id=@item.Id>
-                            <input class="btn btn-danger" type="submit" value="Approve"/>
+                            <input class="btn btn-warning" type="submit" value="Approve"/>
                         </form>
                     }
                     
